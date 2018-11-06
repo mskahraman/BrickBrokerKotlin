@@ -56,8 +56,8 @@ class BrickBroker : Activity() {
 
         private fun createBlocksAndRestart() {
 
-            var b : Int
-            var a : Int
+            var b: Int
+            var a: Int
 
             ball.reset(screenX, screenY - 150)
 
@@ -152,7 +152,7 @@ class BrickBroker : Activity() {
 
                 if (score == numBlocks * 10) {
                     paint.textSize = 90f
-                    canvas?.drawText("Bitti", (screenX/2).toFloat()-10f, (screenY / 2).toFloat(), paint)
+                    canvas?.drawText("Bitti", (screenX / 2).toFloat() - 10f, (screenY / 2).toFloat(), paint)
                     ball.reset(screenX, screenY - 150)
                 }
                 ourHolder?.unlockCanvasAndPost(canvas)
