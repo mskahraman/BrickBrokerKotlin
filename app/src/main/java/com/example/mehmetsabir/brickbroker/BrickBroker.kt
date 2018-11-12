@@ -4,20 +4,29 @@ import android.app.Activity
 import android.content.Context
 import android.graphics.*
 import android.os.Bundle
+import android.support.v7.app.AlertDialog
 import android.util.Log
 import android.view.*
+import android.widget.Button
+import android.widget.RadioGroup
+import kotlinx.android.synthetic.main.alertlayout.*
 import java.util.*
+import kotlin.math.roundToInt
 
 class BrickBroker : Activity() {
 
     private var blockBreakerView: BlockBreakerView? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
         blockBreakerView = BlockBreakerView(this@BrickBroker)
         setContentView(blockBreakerView)
+
     }
+
+
 
     inner class BlockBreakerView(context: Context?) : SurfaceView(context), Runnable {
 
@@ -36,6 +45,8 @@ class BrickBroker : Activity() {
         private var blocks = arrayOfNulls<Blocks>(200)
         private var numBlocks = 0
         private var score = 0
+        private var bundle : Bundle?=null
+        private var levels : Int = 0
 
         init {
             ourHolder = holder
@@ -50,30 +61,71 @@ class BrickBroker : Activity() {
             paddle = Paddle(screenX, screenY)
             ball = Ball()
 
+            bundle = intent.extras
+            levels = bundle!!.getInt("level")
+
             createBlocksAndRestart()
 
         }
 
+
         private fun createBlocksAndRestart() {
 
-            var b: Int
+            var b: Int=0
             var a: Int
 
             ball.reset(screenX, screenY - 150)
 
-            for (row in 0..2) {
+            for (row in 0..levels) {
                 val r = Random()
                 a = r.nextInt(screenX - 300)
-                b = r.nextInt(screenY / 4)
-                if (row == 1) {
-                    b = r.nextInt(screenY / 4) + screenY / 4
-                } else if (row == 2) {
-                    b = r.nextInt(screenY / 4) + screenY / 2
+
+                if(levels==2){
+                    if(row == 0){
+                        b = r.nextInt(screenY / 4)
+                    }else if (row == 1) {
+                        b = r.nextInt(screenY / 4) + screenY / 4
+                    } else if (row == 2) {
+                        b = r.nextInt(screenY / 4) + screenY / 2
+                    }
+                }else if(levels==4){
+                    if(row == 0){
+                        b = r.nextInt((screenY / 7.27).roundToInt())
+                    } else if (row == 1) {
+                        b = r.nextInt((screenY /  7.27).roundToInt()) + (screenY /  7.27).roundToInt()
+                    } else if (row == 2) {
+                        b = r.nextInt((screenY /  7.27).roundToInt()) + (screenY / 3.63).roundToInt()
+                    } else if (row == 3) {
+                        b = r.nextInt((screenY /  7.27).roundToInt()) + (screenY / 2.42).roundToInt()
+                    } else if (row == 4) {
+                        b = r.nextInt((screenY /  7.27).roundToInt()) + (screenY / 1.81).roundToInt()
+                    }
+                }else if(levels==6){
+                    if(row == 0){
+                        b = r.nextInt((screenY / 9.41).roundToInt())
+                    } else if (row == 1) {
+                        b = r.nextInt((screenY /  9.41).roundToInt()) + (screenY /  9.41).roundToInt()
+                    } else if (row == 2) {
+                        b = r.nextInt((screenY /  9.41).roundToInt()) + (screenY / 4.7).roundToInt()
+                    } else if (row == 3) {
+                        b = r.nextInt((screenY /  9.41).roundToInt()) + (screenY / 3.13).roundToInt()
+                    } else if (row == 4) {
+                        b = r.nextInt((screenY /  9.41).roundToInt()) + (screenY / 2.35).roundToInt()
+                    }else if (row == 5) {
+                        b = r.nextInt((screenY /  9.41).roundToInt()) + (screenY / 1.88).roundToInt()
+                    }else if (row == 6) {
+                        b = r.nextInt((screenY /  9.41).roundToInt()) + (screenY / 1.56).roundToInt()
+                    }
                 }
+
 
                 blocks[numBlocks] = Blocks(applicationContext, a, b, 250 + a, 40 + b)
                 numBlocks++
             }
+        }
+
+        private fun drawBlocksDifferentPoint(){
+
         }
 
         override fun run() {
@@ -136,11 +188,16 @@ class BrickBroker : Activity() {
         fun draw() {
             if (ourHolder?.surface?.isValid!!) {
                 canvas = ourHolder?.lockCanvas()
-                canvas?.drawColor(Color.argb(255, 26, 128, 182))
+                canvas?.drawColor(Color.argb(255, 21, 19, 133))
 
                 paint.color = Color.argb(255, 255, 255, 255)
                 canvas?.drawRect(paddle.getRect(), paint)
                 canvas?.drawRect(ball.getRect(), paint)
+
+                paint.style = Paint.Style.FILL
+                paint.textSize = 90f
+                canvas?.drawText("Brick Broken Game", (screenX/5f) , 180f, paint)
+
                 paint.color = Color.argb(255, 249, 129, 0)
                 for (i in 0 until numBlocks) {
                     if (blocks[i]?.getVisibilityOfBlocks()!!) {
