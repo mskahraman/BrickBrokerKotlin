@@ -59,7 +59,7 @@ class BrickBroker : Activity() {
             screenY = size.y
 
             paddle = Paddle(screenX, screenY)
-            ball = Ball()
+            ball = Ball(screenX)
 
             bundle = intent.extras
             levels = bundle!!.getInt("level")
@@ -74,11 +74,11 @@ class BrickBroker : Activity() {
             var b: Int=0
             var a: Int
 
-            ball.reset(screenX, screenY - 150)
+            ball.reset(screenX, (screenY / 1.084).roundToInt())
 
             for (row in 0..levels) {
                 val r = Random()
-                a = r.nextInt(screenX - 300)
+                a = r.nextInt(screenX - (screenX / 3.6).roundToInt())
 
                 if(levels==2){
                     if(row == 0){
@@ -119,7 +119,7 @@ class BrickBroker : Activity() {
                 }
 
 
-                blocks[numBlocks] = Blocks(applicationContext, a, b, 250 + a, 40 + b)
+                blocks[numBlocks] = Blocks(applicationContext, a, b, ((screenY/7.84).roundToInt()) + a, (screenX /27 )+ b)
                 numBlocks++
             }
         }
@@ -164,7 +164,7 @@ class BrickBroker : Activity() {
             if (ball.getRect().bottom > screenY) {
                 ball.reverseYVelocity()
                 ball.clearObstacleY((screenY - 2).toFloat())
-                ball.reset(screenX, screenY - 150)
+                ball.reset(screenX, (screenY / 1.084).roundToInt())
             }
             if (ball.getRect().top < 0) {
                 ball.reverseYVelocity()
@@ -194,9 +194,9 @@ class BrickBroker : Activity() {
                 canvas?.drawRect(paddle.getRect(), paint)
                 canvas?.drawRect(ball.getRect(), paint)
 
-                paint.style = Paint.Style.FILL
-                paint.textSize = 90f
-                canvas?.drawText("Brick Broken Game", (screenX/5f) , 180f, paint)
+//                paint.style = Paint.Style.FILL
+//                paint.textSize = screenX / 12f
+//                canvas?.drawText("Brick Broken Game", (screenX/5f) , (screenY/11f), paint)
 
                 paint.color = Color.argb(255, 249, 129, 0)
                 for (i in 0 until numBlocks) {
@@ -210,7 +210,7 @@ class BrickBroker : Activity() {
                 if (score == numBlocks * 10) {
                     paint.textSize = 90f
                     canvas?.drawText("Bitti", (screenX / 2).toFloat() - 10f, (screenY / 2).toFloat(), paint)
-                    ball.reset(screenX, screenY - 150)
+                    ball.reset(screenX, (screenY / 1.084).roundToInt())
                 }
                 ourHolder?.unlockCanvasAndPost(canvas)
             }
@@ -276,17 +276,17 @@ private class Paddle(screenX: Int, screenY: Int) {
     private var paddleMoving = stopped
 
     init {
-        length = 300
-        height = 30
+        length = (screenX / 3.6).roundToInt()
+        height = screenY / 64
         xSize = screenX
 
-        x = screenX / 2 - 150
-        y = screenY - 150
+        x = screenX / 2 - (length/2)
+        y = (screenY / 1.084).roundToInt()
 
         rect = Rect(x, y, x + length, y + height)
-        paddleSpeed = 850f
-    }
+        paddleSpeed = screenX / 1.2f
 
+    }
     internal fun getRect(): Rect {
         return rect
     }
@@ -296,12 +296,12 @@ private class Paddle(screenX: Int, screenY: Int) {
         paddleMoving = state
     }
 
-    fun update(fps: Long) {
+    internal fun update(fps: Long) {
         if (paddleMoving == leftOfScreen && x > 0) {
             x = Math.round(x - paddleSpeed / fps)
         }
 
-        if (paddleMoving == rightOfScreen && x < xSize - 300) {
+        if (paddleMoving == rightOfScreen && x < xSize - ((xSize / 3.6).roundToInt())) {
             x = Math.round(x + paddleSpeed / fps)
         }
         rect.left = x
@@ -342,18 +342,18 @@ private class Blocks(context: Context?, left: Int, top: Int, width: Int, height:
     }
 }
 
-private class Ball {
+private class Ball(screenX: Int) {
 
     private var rect: Rect
     private var xVelocity: Float = 0.toFloat()
     private var yVelocity: Float = 0.toFloat()
-    private var ballWidth = 15f
-    private var ballHeight = 15f
+    private var ballWidth =  screenX / 72f
+    private var ballHeight = screenX / 72f
 
     init {
 
-        xVelocity = 400f
-        yVelocity = -800f
+        xVelocity = screenX / 2.7f
+        yVelocity = -screenX / 1.35f
         rect = Rect()
     }
 
