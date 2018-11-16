@@ -8,6 +8,4 @@
         android:background="@drawable/backgroundmain"
         tools:context=".BrickBroker">
 
-
-
 </LinearLayout>
